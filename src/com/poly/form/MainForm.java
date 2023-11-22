@@ -17,9 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import com.poly.Application;
 import com.poly.form.other.FormDashboard;
-import com.poly.form.doihang.FormQuanLyDoiHang;
-import com.poly.form.doihang.FormQuanLyDoiHangItem1;
-import com.poly.form.doihang.FormQuanLyDoiHangItem2;
+
 import com.poly.form.giaohang.FormQuanLyGiaoHang;
 import com.poly.form.giaohang.FormQuanLyGiaoHangItem1;
 import com.poly.form.giaohang.FormQuanLyGiaoHangItem2;
@@ -33,6 +31,12 @@ import com.poly.form.nhanvien.FormQuanLyNhanVienItem2;
 import com.poly.form.sanpham.view.DanhSachSanPham;
 import com.poly.form.nhacungcap.view.QuanLyNhaCungCap;
 import com.poly.form.bienthesanpham.view.QuanLyBienTheSanPham;
+import com.poly.form.doihang.view.ChinhSach;
+import com.poly.form.doihang.view.DoiHangChiTiet;
+import com.poly.form.doihang.view.DoiHangConfigs;
+import com.poly.form.doihang.view.FormQuanLyDoiHang;
+import com.poly.form.doihang.view.LichSuChiTiet;
+import com.poly.form.doihang.view.LichSuDoiHang;
 import com.poly.form.khachhang.view.FormCaiDaiMail;
 import com.poly.form.khachhang.view.FormQuanLyKhachHang;
 import com.poly.form.khachhang.view.FormQuanLyKhachHangDaXoa;
@@ -110,14 +114,12 @@ public class MainForm extends JLayeredPane {
                 if (subIndex == 1) { // tương ứng với menu item của (Quản lý sản phẩm)
                     Application.showForm(new DanhSachSanPham());
                 } else if (subIndex == 2) {
-                    Application.showForm(new QuanLyBienTheSanPham());
-                } else if (subIndex == 3) {
                     Application.showForm(new ThongKeSanPham());
-                } else if (subIndex == 4) {
+                } else if (subIndex == 3) {
                     Application.showForm(new QuanLyThuocTinh());
-                } else if (subIndex == 5) {
+                } else if (subIndex == 4) {
                     Application.showForm(new QuanLyTheLoai());
-                } else if (subIndex == 6) {
+                } else if (subIndex == 5) {
                     Application.showForm(new QuanLyNhaCungCap());
                 } else {
                     action.cancel();
@@ -131,12 +133,16 @@ public class MainForm extends JLayeredPane {
                     Application.showForm(new FormQuanLyHoaDonItem2());
                 }
             } else if (index == 3) {
-                if (subIndex == 1) {
-                    Application.showForm(new FormQuanLyDoiHang());
+                if (subIndex == 0) {
+                    Application.showForm(new FormQuanLyDoiHang(menu, doiHangConfigs));
                 } else if (subIndex == 2) {
-                    Application.showForm(new FormQuanLyDoiHangItem1());
+                    Application.showForm(new ChinhSach(menu));
                 } else if (subIndex == 3) {
-                    Application.showForm(new FormQuanLyDoiHangItem2());
+                    Application.showForm(new DoiHangChiTiet(doiHangConfigs, menu));
+                } else if (subIndex == 4) {
+                    Application.showForm(new LichSuDoiHang(menu, doiHangConfigs));
+                } else if (subIndex == 5) {
+                    Application.showForm(new LichSuChiTiet(menu, doiHangConfigs));
                 }
             } else if (index == 4) {
                 if (subIndex == 1) {
@@ -266,4 +272,5 @@ public class MainForm extends JLayeredPane {
             }
         }
     }
+    private DoiHangConfigs doiHangConfigs = new DoiHangConfigs();
 }

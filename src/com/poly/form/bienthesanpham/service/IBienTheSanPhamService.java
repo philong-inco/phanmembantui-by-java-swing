@@ -6,6 +6,8 @@ package com.poly.form.bienthesanpham.service;
 
 import com.poly.form.bienthesanpham.entity.BienTheSanPham;
 import com.poly.form.bienthesanpham.entity.BienTheSanPhamDTO;
+import com.poly.form.sanpham.entity.SanPhamDTO;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -31,7 +33,17 @@ public interface IBienTheSanPhamService {
     List<BienTheSanPhamDTO> getAll();
 
     BienTheSanPhamDTO findBienTheByID(Long id);
-    
+
     Long getIDMauBienTheByIDSanPham(Long idSanPham);
+
+    boolean bienTheIsSale(Long id);
+
+    void insertListBienThe(List<BienTheSanPham> list);
+
+    String exportListToExcel(List<BienTheSanPhamDTO> list, SanPhamDTO sp);
+
+    boolean importExcel(File file);
+
+    void exportMauExcel();
 
 }

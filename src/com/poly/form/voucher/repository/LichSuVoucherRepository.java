@@ -14,7 +14,8 @@ import java.util.List;
  * @author haiyenng
  */
 public class LichSuVoucherRepository {
-     private Connection conn;
+
+    private Connection conn;
 
     public LichSuVoucherRepository() {
         try {
@@ -31,7 +32,7 @@ public class LichSuVoucherRepository {
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                listLichSuVoucher.add(new LichSuVoucher(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getDate(4),rs.getInt(5),rs.getInt(6),rs.getInt(7),rs.getString(8)));
+                listLichSuVoucher.add(new LichSuVoucher(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getDate(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), rs.getString(8)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,16 +97,16 @@ public class LichSuVoucherRepository {
             throw e;
         }
     }
-    
+
     public List<LichSuVoucher> timKiemTheoIdVoucher(int id) {
         List<LichSuVoucher> listLichSuVoucher = new ArrayList<>();
         try {
             String query = "SELECT * FROM voucher_history WHERE id_voucher = ?";
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setObject(1,id);
+            ps.setObject(1, id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                listLichSuVoucher.add(new LichSuVoucher(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getDate(4),rs.getInt(5),rs.getInt(6),rs.getInt(7),rs.getString(8)));
+                listLichSuVoucher.add(new LichSuVoucher(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getDate(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), rs.getString(8)));
             }
         } catch (Exception e) {
             e.printStackTrace();

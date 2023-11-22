@@ -17,6 +17,7 @@ public class BienTheSanPhamDTO {
     private Float giaBan;
     private String thoiGianTao;
     private String ma;
+    private Float giaNiemYet;
     private String thoiGianSua;
     private Integer tongDaBan;
     private String mauSac;
@@ -24,7 +25,7 @@ public class BienTheSanPhamDTO {
     public BienTheSanPhamDTO() {
     }
 
-    public BienTheSanPhamDTO(Long IdBienThe, Integer soLuong, Integer trangThai, String mainImage, Float giaBan, String thoiGianTao, String ma, String thoiGianSua, Integer tongDaBan, String mauSac) {
+    public BienTheSanPhamDTO(Long IdBienThe, Integer soLuong, Integer trangThai, String mainImage, Float giaBan, String thoiGianTao, String ma, Float giaNiemYet, String thoiGianSua, Integer tongDaBan, String mauSac) {
         this.IdBienThe = IdBienThe;
         this.soLuong = soLuong;
         this.trangThai = trangThai;
@@ -32,13 +33,14 @@ public class BienTheSanPhamDTO {
         this.giaBan = giaBan;
         this.thoiGianTao = thoiGianTao;
         this.ma = ma;
+        this.giaNiemYet = giaNiemYet;
         this.thoiGianSua = thoiGianSua;
         this.tongDaBan = tongDaBan;
         this.mauSac = mauSac;
     }
 
     public Object[] toDataRow() {
-        return new Object[]{ma, mauSac, soLuong, giaBan, tongDaBan};
+        return new Object[]{ma, mauSac, soLuong, giaNiemYet, giaBan, tongDaBan};
     }
 
     public Long getIdBienThe() {
@@ -121,9 +123,17 @@ public class BienTheSanPhamDTO {
         this.mauSac = mauSac;
     }
 
+    public Float getGiaNiemYet() {
+        return giaNiemYet;
+    }
+
+    public void setGiaNiemYet(Float giaNiemYet) {
+        this.giaNiemYet = giaNiemYet;
+    }
+
     @Override
     public String toString() {
-        return "BienTheSanPhamDTO{" + "IdBienThe=" + IdBienThe + ", soLuong=" + soLuong + ", trangThai=" + trangThai + ", mainImage=" + mainImage + ", giaBan=" + giaBan + ", thoiGianTao=" + thoiGianTao + ", ma=" + ma + ", thoiGianSua=" + thoiGianSua + ", tongDaBan=" + tongDaBan + ", mauSac=" + mauSac + '}';
+        return "BienTheSanPhamDTO{" + "IdBienThe=" + IdBienThe + ", soLuong=" + soLuong + ", trangThai=" + trangThai + ", mainImage=" + mainImage + ", giaBan=" + giaBan + ", thoiGianTao=" + thoiGianTao + ", ma=" + ma + ", giaNiemYet=" + giaNiemYet + ", thoiGianSua=" + thoiGianSua + ", tongDaBan=" + tongDaBan + ", mauSac=" + mauSac + '}';
     }
 
 }

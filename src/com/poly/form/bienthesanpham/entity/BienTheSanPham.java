@@ -18,11 +18,12 @@ public class BienTheSanPham {
     private Long idMau;
     private Float giaBan;
     private String ma;
+    private Float giaNiemYet;
 
     public BienTheSanPham() {
     }
 
-    public BienTheSanPham(Integer soLuong, Integer trangThai, String mainImage, Long idSanPham, Long idMau, Float giaBan, String ma) {
+    public BienTheSanPham(Integer soLuong, Integer trangThai, String mainImage, Long idSanPham, Long idMau, Float giaBan, String ma, Float giaNiemYet) {
         this.soLuong = soLuong;
         this.trangThai = trangThai;
         this.mainImage = mainImage;
@@ -30,9 +31,10 @@ public class BienTheSanPham {
         this.idMau = idMau;
         this.giaBan = giaBan;
         this.ma = ma;
+        this.giaNiemYet = giaNiemYet;
     }
 
-    public BienTheSanPham(Long idBienThe, Integer soLuong, Integer trangThai, String mainImage, Long idSanPham, Long idMau, Float giaBan, String ma) {
+    public BienTheSanPham(Long idBienThe, Integer soLuong, Integer trangThai, String mainImage, Long idSanPham, Long idMau, Float giaBan, String ma, Float giaNiemYet) {
         this.idBienThe = idBienThe;
         this.soLuong = soLuong;
         this.trangThai = trangThai;
@@ -41,6 +43,7 @@ public class BienTheSanPham {
         this.idMau = idMau;
         this.giaBan = giaBan;
         this.ma = ma;
+        this.giaNiemYet = giaNiemYet;
     }
 
     public Long getIdBienThe() {
@@ -105,6 +108,14 @@ public class BienTheSanPham {
 
     public void setMa(String ma) {
         this.ma = ma;
+    }
+
+    public Float getGiaNiemYet() {
+        return giaNiemYet;
+    }
+
+    public void setGiaNiemYet(Float giaNiemYet) {
+        this.giaNiemYet = giaNiemYet;
     }
 
     @Override

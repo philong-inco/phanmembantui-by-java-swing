@@ -174,6 +174,11 @@ public class SanPhamRepository {
 
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
+                    String path = rs.getString(1);
+                    System.out.println("path: "+path);
+                    if (!path.equals("")) {
+                        list.add(path);
+                    }
                     list.add(rs.getString(1));
                 }
 

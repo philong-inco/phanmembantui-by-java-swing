@@ -31,13 +31,13 @@ public class BienTheSanPhamRepository {
     public List<BienTheSanPhamDTO> findByMaSanPham(String maSanPham) {
         List<BienTheSanPhamDTO> list = new ArrayList<>();
         String query = "SELECT ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage,\n"
-                + " ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.ThoiGianSua, SUM(hdsp.SoLuong), m.TenMau\n"
+                + " ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.GiaNiemYet, ct.ThoiGianSua, SUM(hdsp.SoLuong), m.TenMau\n"
                 + " FROM SanPhamChiTiet ct\n"
                 + " LEFT JOIN SanPham s ON ct.IDSanPham=s.IDSanPham\n"
                 + " LEFT JOIN Mau m ON ct.IDMau=m.IDMau\n"
                 + " LEFT JOIN HoaDon_SanPhamChiTiet hdsp ON ct.IDSanPhamChiTiet=hdsp.IDSanPhamChiTiet\n"
                 + " GROUP BY ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage, ct.IDSanPham,\n"
-                + " ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.ThoiGianSua, s.MaSanPham, m.TenMau, s.MaSanPham\n"
+                + " ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.GiaNiemYet, ct.ThoiGianSua, s.MaSanPham, m.TenMau, s.MaSanPham\n"
                 + " HAVING s.MaSanPham = ?";
         if (cn != null) {
             try {
@@ -53,9 +53,10 @@ public class BienTheSanPhamRepository {
                             rs.getFloat(5),
                             rs.getString(6),
                             rs.getString(7),
-                            rs.getString(8),
-                            rs.getInt(9),
-                            rs.getString(10)
+                            rs.getFloat(8),
+                            rs.getString(9),
+                            rs.getInt(10),
+                            rs.getString(11)
                     );
                     list.add(sanPham);
                 }
@@ -123,8 +124,8 @@ public class BienTheSanPhamRepository {
     }
 
     public void insertBienThe(BienTheSanPham bienThe) {
-        String query = "INSERT INTO SanPhamChiTiet(SoLuong,TrangThai,MainImage,IDSanPham,IDMau,GiaBan, Ma) "
-                + " VALUES (?,?,?,?,?,?,?)";
+        String query = "INSERT INTO SanPhamChiTiet(SoLuong,TrangThai,MainImage,IDSanPham,IDMau,GiaBan, Ma, GiaNiemYet) "
+                + " VALUES (?,?,?,?,?,?,?,?)";
         if (cn != null) {
             try {
                 PreparedStatement ps = cn.prepareStatement(query);
@@ -136,6 +137,7 @@ public class BienTheSanPhamRepository {
                 ps.setLong(5, bienThe.getIdMau());
                 ps.setFloat(6, bienThe.getGiaBan());
                 ps.setString(7, bienThe.getMa());
+                ps.setFloat(8, bienThe.getGiaNiemYet());
                 System.out.println(ps.toString());
                 ps.execute();
             } catch (SQLException e) {
@@ -147,7 +149,7 @@ public class BienTheSanPhamRepository {
 
     public void updateBienThe(BienTheSanPham bienThe) {
         String query = "UPDATE SanPhamChiTiet SET SoLuong = ?, "
-                + " TrangThai = ?, MainImage = ?, IDMau = ?, GiaBan = ? "
+                + " TrangThai = ?, MainImage = ?, IDMau = ?, GiaBan = ?, GiaNiemYet = ? "
                 + " WHERE IDSanPhamChiTiet = ? ";
         if (cn != null) {
             try {
@@ -157,7 +159,8 @@ public class BienTheSanPhamRepository {
                 ps.setString(3, bienThe.getMainImage());
                 ps.setLong(4, bienThe.getIdMau());
                 ps.setFloat(5, bienThe.getGiaBan());
-                ps.setLong(6, bienThe.getIdBienThe());
+                ps.setFloat(6, bienThe.getGiaNiemYet());
+                ps.setLong(7, bienThe.getIdBienThe());
                 ps.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -198,13 +201,14 @@ public class BienTheSanPhamRepository {
     public List<BienTheSanPhamDTO> getAll() {
         List<BienTheSanPhamDTO> list = new ArrayList<>();
         String query = "SELECT ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage,\n"
-                + "ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.ThoiGianSua, SUM(hdsp.SoLuong), m.TenMau\n"
-                + "FROM SanPhamChiTiet ct\n"
-                + "JOIN SanPham s ON ct.IDSanPham=s.IDSanPham\n"
-                + "JOIN Mau m ON ct.IDMau=m.IDMau\n"
-                + "JOIN HoaDon_SanPhamChiTiet hdsp ON ct.IDSanPhamChiTiet=hdsp.IDSanPhamChiTiet\n"
-                + "GROUP BY ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage, ct.IDSanPham, \n"
-                + "ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.ThoiGianSua, s.MaSanPham, m.TenMau\n";
+                + " ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.GiaNiemYet, ct.ThoiGianSua, SUM(hdsp.SoLuong), m.TenMau\n"
+                + " FROM SanPhamChiTiet ct\n"
+                + " LEFT JOIN SanPham s ON ct.IDSanPham=s.IDSanPham\n"
+                + " LEFT JOIN Mau m ON ct.IDMau=m.IDMau\n"
+                + " LEFT JOIN HoaDon_SanPhamChiTiet hdsp ON ct.IDSanPhamChiTiet=hdsp.IDSanPhamChiTiet\n"
+                + " GROUP BY ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage, ct.IDSanPham,\n"
+                + " ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.GiaNiemYet, ct.ThoiGianSua, s.MaSanPham, m.TenMau, s.MaSanPham\n";
+
         if (cn != null) {
             try {
                 PreparedStatement ps = cn.prepareStatement(query);
@@ -219,9 +223,10 @@ public class BienTheSanPhamRepository {
                             rs.getFloat(5),
                             rs.getString(6),
                             rs.getString(7),
-                            rs.getString(8),
-                            rs.getInt(9),
-                            rs.getString(10)
+                            rs.getFloat(8),
+                            rs.getString(9),
+                            rs.getInt(10),
+                            rs.getString(11)
                     );
                     list.add(sanPham);
                 }
@@ -235,13 +240,13 @@ public class BienTheSanPhamRepository {
     public BienTheSanPhamDTO findBienTheByID(Long id) {
 
         String query = "SELECT ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage,\n"
-                + "ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.ThoiGianSua, SUM(hdsp.SoLuong), m.TenMau\n"
+                + "ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.GiaNiemYet, ct.ThoiGianSua, SUM(hdsp.SoLuong), m.TenMau\n"
                 + "FROM SanPhamChiTiet ct\n"
                 + "JOIN SanPham s ON ct.IDSanPham=s.IDSanPham\n"
                 + "JOIN Mau m ON ct.IDMau=m.IDMau\n"
                 + "JOIN HoaDon_SanPhamChiTiet hdsp ON ct.IDSanPhamChiTiet=hdsp.IDSanPhamChiTiet\n"
                 + "GROUP BY ct.IDSanPhamChiTiet, ct.SoLuong, ct.TrangThai, ct.MainImage, ct.IDSanPham, \n"
-                + "ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.ThoiGianSua, s.MaSanPham, m.TenMau\n"
+                + "ct.GiaBan, ct.ThoiGianTao, ct.Ma, ct.GiaNiemYet, ct.ThoiGianSua, s.MaSanPham, m.TenMau\n"
                 + "WHERE ct.IDSanPhamChiTiet = ?";
         if (cn != null) {
             try {
@@ -257,9 +262,10 @@ public class BienTheSanPhamRepository {
                             rs.getFloat(5),
                             rs.getString(6),
                             rs.getString(7),
-                            rs.getString(8),
-                            rs.getInt(9),
-                            rs.getString(10)
+                            rs.getFloat(8),
+                            rs.getString(9),
+                            rs.getInt(10),
+                            rs.getString(11)
                     );
                     return bienThe;
                 }
@@ -271,20 +277,48 @@ public class BienTheSanPhamRepository {
         return null;
     }
 
-//    public boolean isExistBienThe(Long idSanPham, Long idMau) {
-//        String query = "SELECT IDSanPhamChiTiet FROM SanPhamChiTiet WHERE IDSanPham = ? AND IDMau = ?";
-//        if (cn != null) {
-//            try {
-//                PreparedStatement ps = cn.prepareStatement(query);
-//                ResultSet rs = ps.executeQuery();
-//                while (rs.next()) {
-//                    return true;
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    public boolean bienTheIsSale(Long id) {
+        String query = "SELECT id_san_pham_chi_tiet FROM sanphamchitiet_khuyenmai WHERE id_san_pham_chi_tiet = ?";
+        if (cn != null) {
+            try {
+                PreparedStatement ps = cn.prepareStatement(query);
+                ps.setLong(1, id);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public void insertListBienThe(List<BienTheSanPham> list) {
+        String query = "INSERT INTO SanPhamChiTiet(SoLuong,TrangThai,MainImage,IDSanPham,IDMau,GiaBan, Ma, GiaNiemYet) "
+                + " VALUES (?,?,?,?,?,?,?,?)";
+        if (cn != null) {
+            try {
+                PreparedStatement ps = cn.prepareStatement(query);
+                for (BienTheSanPham bienThe : list) {
+                    ps.setInt(1, bienThe.getSoLuong());
+                    ps.setInt(2, bienThe.getTrangThai());
+                    ps.setString(3, bienThe.getMainImage());
+                    ps.setLong(4, bienThe.getIdSanPham());
+                    ps.setLong(5, bienThe.getIdMau());
+                    ps.setFloat(6, bienThe.getGiaBan());
+                    ps.setString(7, bienThe.getMa());
+                    ps.setFloat(8, bienThe.getGiaNiemYet());
+                    System.out.println(ps.toString());
+                    ps.execute();
+                }
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 }
