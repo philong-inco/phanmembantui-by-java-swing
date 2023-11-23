@@ -4,10 +4,24 @@
  */
 package com.poly.form.sanpham.service;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.poly.form.sanpham.entity.SanPham;
 import com.poly.form.sanpham.entity.SanPhamDTO;
 import com.poly.form.sanpham.repository.SanPhamRepository;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.util.Hashtable;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -71,5 +85,7 @@ public class SanPhamService implements ISanPhamService {
     public Long getIDSanPhamByMa(String ma) {
         return repo.getIDSanPhamByMa(ma.trim());
     }
+
+    
 
 }

@@ -44,6 +44,10 @@ public interface IBienTheSanPhamService {
 
     String importExcel();
 
-    void exportMauExcel();
+    String exportMauExcel();
+
+    String renderQRCodeByMaBienThe(String maSP, String maBTSP);
+
+    void insertTextToImage(String path, String maSP, String maBTSP);
 
 }

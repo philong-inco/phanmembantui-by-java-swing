@@ -407,6 +407,11 @@ public class QuanLyBienTheSanPham extends javax.swing.JPanel {
         lbIDBienThe.setText("0");
 
         btnExportQR.setText("Xuất QR");
+        btnExportQR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportQRActionPerformed(evt);
+            }
+        });
 
         jLabel13.setText("Giá niêm yết");
 
@@ -534,6 +539,11 @@ public class QuanLyBienTheSanPham extends javax.swing.JPanel {
         });
 
         btnMauNhapExcel.setText("Mẫu nhập");
+        btnMauNhapExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMauNhapExcelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -793,6 +803,33 @@ public class QuanLyBienTheSanPham extends javax.swing.JPanel {
         resertList();
         updateTable(list);
     }//GEN-LAST:event_btnImportExcelActionPerformed
+
+    private void btnExportQRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportQRActionPerformed
+        if (tblBienThe.getSelectedRow() != -1) {
+            if (JOptionPane.showConfirmDialog(this, "Xuất mã QR?", "Thông báo", JOptionPane.YES_NO_OPTION) == 0) {
+                String maSP = lbMaSanPham.getText();
+                String maBTSP = txtMa.getText();
+                String path = service.renderQRCodeByMaBienThe(maSP, maBTSP);
+                service.insertTextToImage(path, maSP, maBTSP);
+                if (JOptionPane.showConfirmDialog(this, "Ảnh QR lưu tại \\documents\\qr\\ \nTên file: " + maSP + "_" + maBTSP + "\nXem ngay?", "Thông báo", JOptionPane.YES_NO_OPTION) == 0) {
+                    openDocxFile(path);
+                }
+
+            }
+        } else {
+            Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, "Chọn biến thể để xuất QR");
+        }
+    }//GEN-LAST:event_btnExportQRActionPerformed
+
+    private void btnMauNhapExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMauNhapExcelActionPerformed
+        if (JOptionPane.showConfirmDialog(this, "Tải mẫu nhập biến thể sản phẩm", "Tải mẫu nhập", JOptionPane.YES_NO_OPTION) == 0) {
+            String path = service.exportMauExcel();
+            if (JOptionPane.showConfirmDialog(this, "Mẫu nhập lưu tại \\documents\\excel\\MauNhapBienThe\\ \nTên file: MauNhapBienThe.xlsx \nMở ngay?", "Thông báo", JOptionPane.YES_NO_OPTION) == 0) {
+                openDocxFile(path);
+            }
+
+        }
+    }//GEN-LAST:event_btnMauNhapExcelActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;

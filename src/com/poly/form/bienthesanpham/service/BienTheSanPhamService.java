@@ -4,6 +4,11 @@
  */
 package com.poly.form.bienthesanpham.service;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.poly.form.bienthesanpham.entity.BienTheSanPham;
 import com.poly.form.bienthesanpham.entity.BienTheSanPhamDTO;
 import com.poly.form.bienthesanpham.repository.BienTheSanPhamRepository;
@@ -26,12 +31,19 @@ import static com.poly.util.ph31848.GetDateTimeCurrent.getTimeNow;
 import com.poly.util.ph31848.MaRandom;
 import static com.poly.util.ph31848.Validate.checkNumber;
 import static com.poly.util.ph31848.Validate.checkFloat;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -182,7 +194,7 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
 
         for (int i = 0; i < list.size(); i++) {
             BienTheSanPhamDTO bt = list.get(i);
-            row = sheet.createRow(9 + i);
+            row = sheet.createRow(6 + i);
 
             cell = row.createCell(0, CellType.NUMERIC);
             cell.setCellValue(i + 1);
@@ -222,7 +234,7 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return null;   // triển khai
+        return null;
     }
 
     @Override
@@ -243,7 +255,7 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                 // Tạo Set để kiểm tra có biến thể trùng lặp không
                 Set<Long> setMau = new HashSet<>();
                 while (iterator.hasNext()) {
-                    
+
                     Row nextRow = iterator.next();
                     if (nextRow.getRowNum() == 0 || nextRow.getRowNum() == 1) {
                         continue;
@@ -251,7 +263,7 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
 
                     Iterator<Cell> iteratorCell = nextRow.cellIterator();
                     BienTheSanPham bienThe = new BienTheSanPham();
-                    
+
                     while (iteratorCell.hasNext()) {
                         Cell nextCell = iteratorCell.next();
                         int columnIndex = nextCell.getColumnIndex();
@@ -417,14 +429,13 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
 
                         bienThe.setMa(maBienThe);
                         bienThe.setMainImage(mainImage);
-                        System.out.println(bienThe);
 
                     }
                     //check biến thể trùng lặp
                     if (repo.isExistBienThe(bienThe)) {
                         return "Đã có biến thể trùng lặp";
                     }
-                    
+
                     setMau.add(bienThe.getIdMau());
                     list.add(bienThe);
 
@@ -451,8 +462,107 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
     }
 
     @Override
-    public void exportMauExcel() {
-        // triển khai
+    public String exportMauExcel() {
+        XSSFWorkbook wordkbook = new XSSFWorkbook();
+        XSSFSheet sheet = wordkbook.createSheet("NhapBienThe");
+        XSSFRow row = null;
+        Cell cell = null;
+
+        // Styte tiêu đề
+        // Tạo CellStyle để tô nền và in đậm
+        CellStyle style = wordkbook.createCellStyle();
+        style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        // Tiêu đề
+        row = sheet.createRow(0);
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue("Nhập danh sách biến thể");
+
+        // Tạo cột
+        row = sheet.createRow(1);
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue("Mã SP");
+        cell.setCellStyle(style);
+        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue("Màu");
+        cell.setCellStyle(style);
+        cell = row.createCell(2, CellType.STRING);
+        cell.setCellValue("Số lượng");
+        cell.setCellStyle(style);
+        cell = row.createCell(3, CellType.STRING);
+        cell.setCellValue("Giá niêm yết");
+        cell.setCellStyle(style);
+        cell = row.createCell(4, CellType.STRING);
+        cell.setCellValue("Giá bán");
+        cell.setCellStyle(style);
+        cell = row.createCell(5, CellType.STRING);
+        cell.setCellValue("Trạng thái");
+        cell.setCellStyle(style);
+
+        
+        String path = "D:\\1. Backend\\DuAn1\\quanlybantui\\quanlybantui\\documents\\excel\\MauNhapBienThe\\MauNhapBienThe.xlsx";
+        File file = new File(path);
+        try {
+            FileOutputStream fis = new FileOutputStream(file);
+            wordkbook.write(fis);
+            fis.close();
+            return path;
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String renderQRCodeByMaBienThe(String maSP, String maBTSP) {
+        String pathString = "";
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            Hashtable hints = new Hashtable();
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+            BitMatrix matrix = qrCodeWriter.encode(maBTSP, BarcodeFormat.QR_CODE, 200, 200, hints);
+
+            // Write to file image
+            pathString = "D:\\1. Backend\\DuAn1\\quanlybantui\\quanlybantui\\documents\\qr" + "\\" + maSP + "_" + maBTSP + ".png";
+            Path path = FileSystems.getDefault().getPath(pathString);
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(matrix);
+            MatrixToImageWriter.writeToPath(matrix, "PNG", path);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return pathString;
+    }
+
+    @Override
+    public void insertTextToImage(String path, String maSP, String maBTSP) {
+        try {
+            // Đọc ảnh từ đường dẫn
+            BufferedImage image = ImageIO.read(new File(path));
+
+            // Tạo đối tượng Graphics để thêm văn bản
+            Graphics2D g = image.createGraphics();
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.PLAIN, 20)); // Thiết lập font và kích thước
+
+            // Chèn văn bản vào ảnh
+            String data = maSP + "_" + maBTSP;
+            g.drawString(data, 20, image.getHeight() - 7);
+
+            // Ghi ảnh mới có văn bản vào đường dẫn đầu ra
+            ImageIO.write(image, "png", new File(path));
+
+            // Giải phóng tài nguyên
+            g.dispose();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

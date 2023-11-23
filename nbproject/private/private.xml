@@ -5,7 +5,7 @@
         <group>
             <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/view/QuanLyBienTheSanPham.java</file>
             <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/service/BienTheSanPhamService.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/repository/BienTheSanPhamRepository.java</file>
+            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/service/IBienTheSanPhamService.java</file>
         </group>
     </open-files>
 </project-private>

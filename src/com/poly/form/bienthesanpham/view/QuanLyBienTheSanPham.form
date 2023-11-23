@@ -467,6 +467,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Xu&#x1ea5;t QR"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExportQRActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="txtGiaNiemYet">
         </Component>
@@ -632,6 +635,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="M&#x1eab;u nh&#x1ead;p"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMauNhapExcelActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
