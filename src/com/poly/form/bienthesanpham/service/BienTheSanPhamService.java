@@ -29,7 +29,9 @@ import static com.poly.util.ph31848.Validate.checkFloat;
 import java.awt.Font;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import javax.swing.JFileChooser;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -238,8 +240,10 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                 // Tạo list chứa các biến thể import
                 List<BienTheSanPham> list = new ArrayList<>();
 
+                // Tạo Set để kiểm tra có biến thể trùng lặp không
+                Set<Long> setMau = new HashSet<>();
                 while (iterator.hasNext()) {
-                    System.out.println("Dòng");
+                    
                     Row nextRow = iterator.next();
                     if (nextRow.getRowNum() == 0 || nextRow.getRowNum() == 1) {
                         continue;
@@ -247,6 +251,7 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
 
                     Iterator<Cell> iteratorCell = nextRow.cellIterator();
                     BienTheSanPham bienThe = new BienTheSanPham();
+                    
                     while (iteratorCell.hasNext()) {
                         Cell nextCell = iteratorCell.next();
                         int columnIndex = nextCell.getColumnIndex();
@@ -255,7 +260,16 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                 if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
                                     return "Mã SP bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
-                                String maSP = nextCell.getStringCellValue().trim();
+                                // Case type excel
+                                String maSP = "";
+                                if (nextCell.getCellType() == CellType.NUMERIC) {
+                                    maSP += nextCell.getNumericCellValue();
+                                } else if (nextCell.getCellType() == CellType.STRING) {
+                                    maSP += nextCell.getStringCellValue();
+                                }
+                                maSP = maSP.trim();
+                                // Case type excel
+
                                 if (maSP.isEmpty()) {
                                     return "Mã SP bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
@@ -270,12 +284,22 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                 if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
                                     return "Màu bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
-                                String tenMau = nextCell.getStringCellValue().trim();
+                                // Case type excel
+                                String tenMau = "";
+                                if (nextCell.getCellType() == CellType.NUMERIC) {
+                                    tenMau += nextCell.getNumericCellValue();
+                                } else if (nextCell.getCellType() == CellType.STRING) {
+                                    tenMau += nextCell.getStringCellValue();
+                                }
+                                tenMau = tenMau.trim();
+                                // Case type excel
+
                                 if (tenMau.isEmpty()) {
                                     return "Màu bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
 
                                 Long idMau = repoMau.getIDMauByTen(tenMau);
+                                System.out.println("ID màu: " + idMau);
                                 if (idMau == null) {
                                     String maMau = "";
                                     do {
@@ -284,6 +308,7 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                     ThuocTinhMau newMau = new ThuocTinhMau(maMau, tenMau, "Mô tả: " + tenMau, 1);
                                     repoMau.insertMau(newMau);
                                     idMau = repoMau.getIDMauByTen(tenMau);
+                                    System.out.println("ID màu: " + idMau);
                                 }
                                 bienThe.setIdMau(idMau);
                                 break;
@@ -291,7 +316,16 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                 if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
                                     return "Số lượng bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
-                                String soLuong = ("" + Integer.valueOf((int) nextCell.getNumericCellValue())).trim();
+                                // Case type excel
+                                String soLuong = "";
+                                if (nextCell.getCellType() == CellType.NUMERIC) {
+                                    soLuong += ((int) nextCell.getNumericCellValue());
+                                } else if (nextCell.getCellType() == CellType.STRING) {
+                                    soLuong += nextCell.getStringCellValue();
+                                }
+                                soLuong = soLuong.trim();
+                                System.out.println(soLuong);
+                                // Case type excel
                                 if (soLuong.isEmpty()) {
                                     return "Số lượng bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
@@ -305,7 +339,15 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                 if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
                                     return "Giá niêm yết bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
-                                String giaNiemYet = nextCell.getStringCellValue().trim();
+                                // Case type excel
+                                String giaNiemYet = "";
+                                if (nextCell.getCellType() == CellType.NUMERIC) {
+                                    giaNiemYet += nextCell.getNumericCellValue();
+                                } else if (nextCell.getCellType() == CellType.STRING) {
+                                    giaNiemYet += nextCell.getStringCellValue();
+                                }
+                                giaNiemYet = giaNiemYet.trim();
+                                // Case type excel
                                 if (giaNiemYet.isEmpty()) {
                                     return "Giá niêm yết bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
@@ -319,7 +361,15 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                 if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
                                     return "Giá bán bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
-                                String giaBan = nextCell.getStringCellValue().trim();
+                                // Case type excel
+                                String giaBan = "";
+                                if (nextCell.getCellType() == CellType.NUMERIC) {
+                                    giaBan += nextCell.getNumericCellValue();
+                                } else if (nextCell.getCellType() == CellType.STRING) {
+                                    giaBan += nextCell.getStringCellValue();
+                                }
+                                giaBan = giaBan.trim();
+                                // Case type excel
                                 if (giaBan.isEmpty()) {
                                     return "Giá bán bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
@@ -332,7 +382,15 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
                                 if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
                                     return "Trạng thái bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
-                                String trangThaiStr = nextCell.getStringCellValue().trim();
+                                // Case type excel
+                                String trangThaiStr = "";
+                                if (nextCell.getCellType() == CellType.NUMERIC) {
+                                    trangThaiStr += nextCell.getNumericCellValue();
+                                } else if (nextCell.getCellType() == CellType.STRING) {
+                                    trangThaiStr += nextCell.getStringCellValue();
+                                }
+                                trangThaiStr = trangThaiStr.trim();
+                                // Case type excel
                                 if (trangThaiStr.isEmpty()) {
                                     return "Trạng thái bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
                                 }
@@ -359,13 +417,21 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
 
                         bienThe.setMa(maBienThe);
                         bienThe.setMainImage(mainImage);
+                        System.out.println(bienThe);
 
                     }
+                    //check biến thể trùng lặp
+                    if (repo.isExistBienThe(bienThe)) {
+                        return "Đã có biến thể trùng lặp";
+                    }
+                    
+                    setMau.add(bienThe.getIdMau());
                     list.add(bienThe);
+
                 }
-
-               
-
+                if (list.size() != setMau.size()) {
+                    return "Không thể có 2 biến thể cùng màu\nVui lòng kiểm tra lại";
+                }
                 boolean save = repo.insertListBienThe(list);
 
                 // Đóng FileInputStream và Workbook để giải phóng tài nguyên

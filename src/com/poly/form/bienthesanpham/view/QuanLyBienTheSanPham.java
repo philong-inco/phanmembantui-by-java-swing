@@ -788,7 +788,7 @@ public class QuanLyBienTheSanPham extends javax.swing.JPanel {
 
     private void btnImportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportExcelActionPerformed
         String result = service.importExcel();
-        Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+        Notifications.getInstance().show(Notifications.Type.SUCCESS, Notifications.Location.TOP_CENTER, result);
         list = service.findByMaSanPham(sp.getMaSanPham());
         resertList();
         updateTable(list);
