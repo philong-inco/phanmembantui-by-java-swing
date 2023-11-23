@@ -27,6 +27,23 @@ public class SanPhamRepository {
         cn = DBConnect.getConnection();
     }
 
+    public Long getIDSanPhamByMa(String ma) {
+        String query = "SELECT IDSanPham FROM SanPham WHERE MaSanPham = ?";
+        if (cn != null) {
+            try {
+                PreparedStatement ps = cn.prepareStatement(query);
+                ps.setString(1, ma);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    return rs.getLong(1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public List<SanPhamDTO> getAll() {
         List<SanPhamDTO> list = new ArrayList<>();
         String query = "SELECT s.IDSanPham, s.MaSanPham, s.TenSanPham, s.MoTaSanPham,cc.TenNhaCungCap, "
@@ -175,7 +192,7 @@ public class SanPhamRepository {
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
                     String path = rs.getString(1);
-                    System.out.println("path: "+path);
+                    System.out.println("path: " + path);
                     if (!path.equals("")) {
                         list.add(path);
                     }

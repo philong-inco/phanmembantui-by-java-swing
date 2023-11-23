@@ -295,9 +295,10 @@ public class BienTheSanPhamRepository {
         return false;
     }
 
-    public void insertListBienThe(List<BienTheSanPham> list) {
+    public boolean insertListBienThe(List<BienTheSanPham> list) {
         String query = "INSERT INTO SanPhamChiTiet(SoLuong,TrangThai,MainImage,IDSanPham,IDMau,GiaBan, Ma, GiaNiemYet) "
                 + " VALUES (?,?,?,?,?,?,?,?)";
+        boolean check = false;
         if (cn != null) {
             try {
                 PreparedStatement ps = cn.prepareStatement(query);
@@ -310,14 +311,16 @@ public class BienTheSanPhamRepository {
                     ps.setFloat(6, bienThe.getGiaBan());
                     ps.setString(7, bienThe.getMa());
                     ps.setFloat(8, bienThe.getGiaNiemYet());
-                    System.out.println(ps.toString());
-                    ps.execute();
+
+                    check = ps.execute();
+
                 }
                 ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+        return check;
 
     }
 

@@ -8,6 +8,9 @@ import com.poly.form.bienthesanpham.entity.BienTheSanPham;
 import com.poly.form.bienthesanpham.entity.BienTheSanPhamDTO;
 import com.poly.form.bienthesanpham.repository.BienTheSanPhamRepository;
 import com.poly.form.sanpham.entity.SanPhamDTO;
+import com.poly.form.sanpham.repository.SanPhamRepository;
+import com.poly.form.thuoctinh.entity.ThuocTinhMau;
+import com.poly.form.thuoctinh.repository.ThuocTinhMauRepository;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,10 +23,19 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import static com.poly.util.ph31848.GetDateTimeCurrent.getTimeNow;
+import com.poly.util.ph31848.MaRandom;
+import static com.poly.util.ph31848.Validate.checkNumber;
+import static com.poly.util.ph31848.Validate.checkFloat;
 import java.awt.Font;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.swing.JFileChooser;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  *
@@ -32,9 +44,13 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public class BienTheSanPhamService implements IBienTheSanPhamService {
 
     private BienTheSanPhamRepository repo;
+    private SanPhamRepository repoSP;
+    private ThuocTinhMauRepository repoMau;
 
     public BienTheSanPhamService() {
         repo = new BienTheSanPhamRepository();
+        repoSP = new SanPhamRepository();
+        repoMau = new ThuocTinhMauRepository();
     }
 
     @Override
@@ -93,8 +109,8 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
     }
 
     @Override
-    public void insertListBienThe(List<BienTheSanPham> list) {
-        repo.insertListBienThe(list);
+    public boolean insertListBienThe(List<BienTheSanPham> list) {
+        return repo.insertListBienThe(list);
     }
 
     @Override
@@ -109,7 +125,6 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
         CellStyle style = wordkbook.createCellStyle();
         style.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        
 
         // Mã sản phẩm
         row = sheet.createRow(1);
@@ -209,8 +224,164 @@ public class BienTheSanPhamService implements IBienTheSanPhamService {
     }
 
     @Override
-    public boolean importExcel(File file) {
-        return false;   // triển khai
+    public String importExcel() {
+        JFileChooser fileChooser = new JFileChooser("D:\\1. Backend\\DuAn1\\quanlybantui\\quanlybantui\\documents");
+        int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try (FileInputStream fis = new FileInputStream(selectedFile); XSSFWorkbook workbook = new XSSFWorkbook(fis);) {
+
+                // Lấy sheet đầu tiên từ workbook
+                XSSFSheet sheet = workbook.getSheetAt(0);
+                Iterator<Row> iterator = sheet.iterator();
+
+                // Tạo list chứa các biến thể import
+                List<BienTheSanPham> list = new ArrayList<>();
+
+                while (iterator.hasNext()) {
+                    System.out.println("Dòng");
+                    Row nextRow = iterator.next();
+                    if (nextRow.getRowNum() == 0 || nextRow.getRowNum() == 1) {
+                        continue;
+                    }
+
+                    Iterator<Cell> iteratorCell = nextRow.cellIterator();
+                    BienTheSanPham bienThe = new BienTheSanPham();
+                    while (iteratorCell.hasNext()) {
+                        Cell nextCell = iteratorCell.next();
+                        int columnIndex = nextCell.getColumnIndex();
+                        switch (columnIndex) {
+                            case 0:
+                                if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
+                                    return "Mã SP bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                String maSP = nextCell.getStringCellValue().trim();
+                                if (maSP.isEmpty()) {
+                                    return "Mã SP bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+
+                                Long idSP = repoSP.getIDSanPhamByMa(maSP);
+                                if (idSP == null) {
+                                    return "Mã SP không tồn tại " + maSP + "\nDòng: " + (nextCell.getRowIndex() + 1);
+                                }
+                                bienThe.setIdSanPham(idSP);
+                                break;
+                            case 1:
+                                if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
+                                    return "Màu bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                String tenMau = nextCell.getStringCellValue().trim();
+                                if (tenMau.isEmpty()) {
+                                    return "Màu bị bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+
+                                Long idMau = repoMau.getIDMauByTen(tenMau);
+                                if (idMau == null) {
+                                    String maMau = "";
+                                    do {
+                                        maMau = "MA" + MaRandom.renderMa();
+                                    } while (repoMau.isExistMa(maMau));
+                                    ThuocTinhMau newMau = new ThuocTinhMau(maMau, tenMau, "Mô tả: " + tenMau, 1);
+                                    repoMau.insertMau(newMau);
+                                    idMau = repoMau.getIDMauByTen(tenMau);
+                                }
+                                bienThe.setIdMau(idMau);
+                                break;
+                            case 2:
+                                if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
+                                    return "Số lượng bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                String soLuong = ("" + Integer.valueOf((int) nextCell.getNumericCellValue())).trim();
+                                if (soLuong.isEmpty()) {
+                                    return "Số lượng bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+
+                                if (!checkNumber(soLuong)) {
+                                    return "Số lượng không hợp lệ tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                bienThe.setSoLuong(Integer.valueOf(soLuong));
+                                break;
+                            case 3:
+                                if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
+                                    return "Giá niêm yết bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                String giaNiemYet = nextCell.getStringCellValue().trim();
+                                if (giaNiemYet.isEmpty()) {
+                                    return "Giá niêm yết bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                if (!checkFloat(giaNiemYet)) {
+                                    return "Giá niêm yết không hợp lệ tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                bienThe.setGiaNiemYet(Float.valueOf(giaNiemYet));
+                                break;
+
+                            case 4:
+                                if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
+                                    return "Giá bán bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                String giaBan = nextCell.getStringCellValue().trim();
+                                if (giaBan.isEmpty()) {
+                                    return "Giá bán bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                if (!checkFloat(giaBan)) {
+                                    return "Giá bán không hợp lệ tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                bienThe.setGiaBan(Float.valueOf(giaBan));
+                                break;
+                            case 5:
+                                if (nextCell.getCellType() == CellType.BLANK || nextCell.getCellType() == CellType._NONE) {
+                                    return "Trạng thái bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                String trangThaiStr = nextCell.getStringCellValue().trim();
+                                if (trangThaiStr.isEmpty()) {
+                                    return "Trạng thái bỏ trống tại hàng " + (nextCell.getRowIndex() + 1);
+                                }
+                                Integer trangThai = null;
+                                if (trangThaiStr.equalsIgnoreCase("Hoạt động")) {
+                                    trangThai = 1;
+                                }
+                                if (trangThaiStr.equalsIgnoreCase("Không hoạt động")) {
+                                    trangThai = 0;
+                                }
+                                if (trangThai == null) {
+                                    return "Vui lòng sửa lại trạng thái tại dòng " + (nextCell.getRowIndex() + 1) + "\nTrạng thái hợp lệ: Hoạt động, Không hoạt động";
+                                }
+                                bienThe.setTrangThai(trangThai);
+                                break;
+                            default:
+                                break;
+                        }
+                        String maBienThe = "";
+                        do {
+                            maBienThe = "BT" + MaRandom.renderMa();
+                        } while (repo.isExistMa(maBienThe));
+                        String mainImage = "D:\\1. Backend\\DuAn1\\quanlybantui\\quanlybantui\\documents\\img_sp\\0.png";
+
+                        bienThe.setMa(maBienThe);
+                        bienThe.setMainImage(mainImage);
+
+                    }
+                    list.add(bienThe);
+                }
+
+               
+
+                boolean save = repo.insertListBienThe(list);
+
+                // Đóng FileInputStream và Workbook để giải phóng tài nguyên
+                fis.close();
+                workbook.close();
+                if (!save) {
+                    return "Nhập excel thành công";
+                } else {
+                    return "Nhập thất bại";
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return "Nhập thất bại";
     }
 
     @Override

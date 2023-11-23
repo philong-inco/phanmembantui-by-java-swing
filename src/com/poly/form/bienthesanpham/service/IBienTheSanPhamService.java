@@ -38,11 +38,11 @@ public interface IBienTheSanPhamService {
 
     boolean bienTheIsSale(Long id);
 
-    void insertListBienThe(List<BienTheSanPham> list);
+    boolean insertListBienThe(List<BienTheSanPham> list);
 
     String exportListToExcel(List<BienTheSanPhamDTO> list, SanPhamDTO sp);
 
-    boolean importExcel(File file);
+    String importExcel();
 
     void exportMauExcel();
 

@@ -33,4 +33,6 @@ public interface ISanPhamService {
             int cbxSearchBienThe, Integer txtCbxSearchBienThe, int cbxSearchDateType,
             String txtDateFirst, String txtTimeFirst, String txtDateSecond,
             String txtTimeSecond, int cbxSearchTrangThai);
+
+    Long getIDSanPhamByMa(String ma);
 }

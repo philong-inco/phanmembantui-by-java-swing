@@ -520,6 +520,11 @@ public class QuanLyBienTheSanPham extends javax.swing.JPanel {
         jLabel10.setText("ID:");
 
         btnImportExcel.setText("Nhập Excel");
+        btnImportExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImportExcelActionPerformed(evt);
+            }
+        });
 
         btnExportExcel.setText("Xuất Excel");
         btnExportExcel.addActionListener(new java.awt.event.ActionListener() {
@@ -780,6 +785,14 @@ public class QuanLyBienTheSanPham extends javax.swing.JPanel {
 
         }
     }//GEN-LAST:event_btnExportExcelActionPerformed
+
+    private void btnImportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportExcelActionPerformed
+        String result = service.importExcel();
+        Notifications.getInstance().show(Notifications.Type.ERROR, Notifications.Location.TOP_CENTER, result);
+        list = service.findByMaSanPham(sp.getMaSanPham());
+        resertList();
+        updateTable(list);
+    }//GEN-LAST:event_btnImportExcelActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;

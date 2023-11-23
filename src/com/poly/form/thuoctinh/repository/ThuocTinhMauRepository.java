@@ -27,6 +27,23 @@ public class ThuocTinhMauRepository {
         cn = DBConnect.getConnection();
     }
 
+    public Long getIDMauByTen(String ten) {
+        String query = "SELECT IDMau FROM Mau WHERE TenMau = ?";
+        if (cn != null) {
+            try {
+                PreparedStatement ps = cn.prepareStatement(query);
+                ps.setString(1, ten);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    return rs.getLong(1);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     public List<ThuocTinhMauDTO> getAll() {
         List<ThuocTinhMauDTO> list = new ArrayList<>();
         String query = "SELECT m.IDMau,m.Ma, m.TenMau, m.MoTaMau, m.TrangThai,m.ThoiGianTao, m.ThoiGianSua, COUNT(DISTINCT s.IDSanPham), COUNT(ct.IDSanPhamChiTiet), SUM(ct.SoLuong)\n"

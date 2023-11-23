@@ -3,14 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/doihang/service/DoiHangService/impl/ProductDetailService.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/doihang/view/DoiHangChiTiet.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/database/DBConnect.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/doihang/repository/DoiHangRepository/HoaDonRepository.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/doihang/repository/DoiHangRepository/ProductDetailRepository.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/doihang/repository/DoiHangRepository/PhieuDoiRepository.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/Application.java</file>
-            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/doihang/view/ConfirmDoiHang.java</file>
+            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/view/QuanLyBienTheSanPham.java</file>
+            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/service/BienTheSanPhamService.java</file>
+            <file>file:/D:/1.%20Backend/DuAn1/quanlybantui/quanlybantui/src/com/poly/form/bienthesanpham/repository/BienTheSanPhamRepository.java</file>
         </group>
     </open-files>
 </project-private>

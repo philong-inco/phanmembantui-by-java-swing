@@ -61,4 +61,9 @@ public class ThuocTinhMauService implements IThuocTinhMauService {
         return repo.isExistMa(str.trim());
     }
 
+    @Override
+    public Long getIDMauByTen(String ten) {
+        return repo.getIDMauByTen(ten.trim());
+    }
+
 }

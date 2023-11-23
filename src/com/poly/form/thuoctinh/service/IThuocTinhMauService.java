@@ -29,4 +29,6 @@ public interface IThuocTinhMauService {
     List<ThuocTinhMauDTO> search(String keyword, int cbxSanPhamIndexType, Integer soSanPham, int cbxBTSPType, Integer soBTSP, int cbxSoLuongCai, Integer soLuongCai, int cbxTrangThai, int cbxThoiGianSearchType, String dateFirstFormat, String timeFirst, String dateSecondFormat, String timeSecond);
 
     boolean isExistMa(String str);
+
+    Long getIDMauByTen(String ten);
 }

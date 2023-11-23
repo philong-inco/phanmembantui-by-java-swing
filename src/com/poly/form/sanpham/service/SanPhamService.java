@@ -67,4 +67,9 @@ public class SanPhamService implements ISanPhamService {
                 txtDateFirst, txtTimeFirst, txtDateSecond, txtTimeSecond, cbxSearchTrangThai);
     }
 
+    @Override
+    public Long getIDSanPhamByMa(String ma) {
+        return repo.getIDSanPhamByMa(ma.trim());
+    }
+
 }
