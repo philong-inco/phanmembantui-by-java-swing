@@ -1,4 +1,4 @@
-﻿
+﻿-- sửa phieu_giao_hang cho nghĩa
 --CREATE DATABASE LONG_HUNG_NGHIA3_Yen_Luat4
 --USE LONG_HUNG_NGHIA3_Yen_Luat4
 --GO
@@ -434,34 +434,35 @@ INSERT INTO HoaDon_SanPhamChiTiet(IDHoaDon, IDSanPhamChiTiet, GiaTien, SoLuong) 
 	(3,5,220.82,1)
 
 -- Nghĩa --
+
 CREATE TABLE phieu_giao_hang (
     id BIGINT IDENTITY(1,1) PRIMARY KEY,
     ma NVARCHAR(50),
-    so_luong BIGINT,
-    gia_tri BIGINT,
-    gia_giam_toi_da BIGINT,
-    gia_giam_toi_thieu BIGINT,
-	thoi_gian_sua BIGINT,
-	thoi_gian_tao BIGINT,
-	mo_ta NVARCHAR(MAX),
+	nguoi_nhan NVARCHAR(255),
+	sdt_nguoi_nhan NVARCHAR(255),
+	dia_chi NVARCHAR(255),
+	nguoi_ship NVARCHAR(255),
+	sdt_nguoi_ship NVARCHAR(255),
+	thoi_gian_nhan BIGINT,
+	mo_ta NVARCHAR(255),
+	thoi_gian_giao BIGINT,
     trang_thai BIT,
+	IDHoaDon BIGINT,
 )
 
 -- Thêm dữ liệu vào bảng phieu_giao_hang
-INSERT INTO phieu_giao_hang (ma, so_luong, gia_tri, gia_giam_toi_da, gia_giam_toi_thieu, thoi_gian_sua, thoi_gian_tao, mo_ta, trang_thai)
+INSERT INTO phieu_giao_hang (ma, nguoi_nhan, sdt_nguoi_nhan, dia_chi, nguoi_ship, sdt_nguoi_ship, thoi_gian_giao, thoi_gian_nhan, mo_ta, IDHoaDon, trang_thai)
 VALUES
-    ('MSP001', 10, 1000, 50, 10, 1636336800, 1636336800, N'Mô tả cho bản ghi 1', 1),
-    ('MSP002', 5, 500, 30, 5, 1636336900, 1636336900, N'Mô tả cho bản ghi 2', 0),
-    ('MSP003', 7, 700, 40, 8, 1636337000, 1636337000, N'Mô tả cho bản ghi 3', 1),
-    ('MSP004', 8, 800, 45, 9, 1636337100, 1636337100, N'Mô tả cho bản ghi 4', 0),
-    ('MSP005', 12, 1200, 60, 12, 1636337200, 1636337200, N'Mô tả cho bản ghi 5', 1),
-    ('MSP006', 3, 300, 20, 4, 1636337300, 1636337300, N'Mô tả cho bản ghi 6', 0),
-    ('MSP007', 9, 900, 50, 10, 1636337400, 1636337400, N'Mô tả cho bản ghi 7', 1),
-    ('MSP008', 15, 1500, 70, 14, 1636337500, 1636337500, N'Mô tả cho bản ghi 8', 0),
-    ('MSP009', 6, 600, 35, 7, 1636337600, 1636337600, N'Mô tả cho bản ghi 9', 1),
-    ('MSP010', 11, 1100, 55, 11, 1636337700, 1636337700, N'Mô tả cho bản ghi 10', 0);
-
--- NGhĩa
+    ('MSP001', N'Nguyen Thi A', '0849070512', N'BacTuLiem 1', 'Nguyen văn c', '0849070512', 1636336800, 1636336800, N'Mô tả cho bản ghi 1', 1, 1),
+    ('MSP002', N'Nguyen Văn B', '084907052', N'BacTuLiem 2', 'Nguyen văn c', '084907052', 1636336900, 1636336900, N'Mô tả cho bản ghi 2', 2, 1),
+    ('MSP003', N'Nguyen Thi C', '0849070515', N'BacTuLiem 3', 'Nguyen văn c', '0849070515', 1636337000, 1636337000, N'Mô tả cho bản ghi 3', 3, 1),
+    ('MSP004', N'Nguyen Bá D', '0849070516', N'BacTuLiem 4', 'Nguyen văn c', '0849070516', 1636337100, 1636337100, N'Mô tả cho bản ghi 4', 4, 1),
+    ('MSP005', N'Nguyen Thi E', '0849070542', N'BacTuLiem 5', 'Nguyen văn c', '0849070542', 1636337200, 1636337200, N'Mô tả cho bản ghi 5', 5, 1),
+    ('MSP006', N'Nguyen Bảo F', '0849070562', N'BacTuLiem 6', 'Nguyen văn c', '0849070562', 1636337300, 1636337300, N'Mô tả cho bản ghi 6', 6, 1),
+    ('MSP007', N'Nguyen Thi G', '0849070512', N'BacTuLiem 7', 'Nguyen văn c', '0849070512', 1636337400, 1636337400, N'Mô tả cho bản ghi 7', 7, 1),
+    ('MSP008', N'Nguyen Bách H', '0849070517', N'BacTuLiem 8', 'Nguyen văn c', '0849070517', 1636337500, 1636337500, N'Mô tả cho bản ghi 8', 8, 1),
+    ('MSP009', N'Nguyen Hợp T', '0849070512', N'BacTuLiem 9', 'Nguyen văn c', '0849070512', 1636337600, 1636337600, N'Mô tả cho bản ghi 9', 9, 1),
+    ('MSP010', N'Nguyen Thi U', '0849070562', N'BacTuLiem 10', 'Nguyen văn c', '0849070562', 1636337700, 1636337700, N'Mô tả cho bản ghi 10', 10, 1);
 --CREATE TABLE phieu_giao_hang (
 --    id BIGINT IDENTITY(1,1) PRIMARY KEY,
 --    ma NVARCHAR(50),
