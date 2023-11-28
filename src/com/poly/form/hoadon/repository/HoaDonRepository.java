@@ -125,7 +125,7 @@ public class HoaDonRepository {
 
     public List<GioHang> getAllBienTheByIdHoaDon(Long id) {
         List<GioHang> list = new ArrayList<>();
-        String query = "SELECT spct.IDSanPhamChiTiet, s.MaSanPham, s.TenSanPham, m.TenMau, hdct.SoLuong, spct.GiaBan, \n"
+        String query = "SELECT hdct.ID, spct.IDSanPhamChiTiet, s.MaSanPham, s.TenSanPham, m.TenMau, hdct.SoLuong, spct.GiaBan, \n"
                 + "hdct.SoLuong*spct.GiaBan*SUM(km.phan_tram_giam_gia)/100 AS KhuyenMai, \n"
                 + "hdct.SoLuong*spct.GiaBan-hdct.SoLuong*spct.GiaBan*SUM(km.phan_tram_giam_gia)/100 AS ThanhTien\n"
                 + "FROM HoaDon_SanPhamChiTiet hdct\n"
@@ -135,7 +135,7 @@ public class HoaDonRepository {
                 + "JOIN sanphamchitiet_khuyenmai spkm ON spct.IDSanPhamChiTiet=spkm.id_san_pham_chi_tiet\n"
                 + "JOIN khuyen_mai km ON spkm.id_khuyen_mai=km.id\n"
                 + "WHERE hdct.IDHoaDon = ? \n"
-                + "GROUP BY s.MaSanPham, s.TenSanPham, m.TenMau, hdct.SoLuong, spct.GiaBan,spct.IDSanPhamChiTiet";
+                + "GROUP BY s.MaSanPham, s.TenSanPham, m.TenMau, hdct.SoLuong, spct.GiaBan,spct.IDSanPhamChiTiet, hdct.ID";
         try {
             PreparedStatement ps = cn.prepareStatement(query);
             ps.setLong(1, id);
@@ -143,13 +143,14 @@ public class HoaDonRepository {
             while (rs.next()) {
                 GioHang gioHang = new GioHang(
                         rs.getLong(1),
-                        rs.getString(2),
+                        rs.getLong(2),
                         rs.getString(3),
                         rs.getString(4),
-                        rs.getInt(5),
-                        rs.getFloat(6),
+                        rs.getString(5),
+                        rs.getInt(6),
                         rs.getFloat(7),
-                        rs.getFloat(8));
+                        rs.getFloat(8),
+                        rs.getFloat(9));
                 list.add(gioHang);
             }
         } catch (Exception e) {
@@ -216,18 +217,20 @@ public class HoaDonRepository {
 
     public Long getIDBienTheByMa(String ma) {
         String query = "SELECT IDSanPhamChiTiet FROM SanPhamChiTiet WHERE Ma = ?";
-        Long result = 0L;
+        System.out.println(query);
+        System.out.println(ma);
+
         try {
             PreparedStatement ps = cn.prepareStatement(query);
             ps.setString(1, ma);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                result = rs.getLong(1);
+                return rs.getLong(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+        return null;
     }
 
     public List<BienTheSearch> searchSanPham(String keyword, String mau) {
@@ -361,7 +364,7 @@ public class HoaDonRepository {
     }
 
     public Float getTongTienHoaDonById(Long id) {
-        String query = "SELECT (SELECT SUM(GiaTien) FROM HoaDon_SanPhamChiTiet WHERE IDHoaDon = hd.IDHoaDon) AS TongTien\n"
+        String query = "SELECT (SELECT SUM(GiaTien*SoLuong) FROM HoaDon_SanPhamChiTiet WHERE IDHoaDon = hd.IDHoaDon) AS TongTien\n"
                 + "FROM HoaDon hd\n"
                 + "LEFT JOIN nhan_vien nv ON hd.IDNhanVien=nv.id\n"
                 + "LEFT JOIN khach_hang kh ON hd.IDKhachHang=kh.id\n"
@@ -413,7 +416,7 @@ public class HoaDonRepository {
     }
 
     public Float getTienThanhToanHoaDonById(Long id) {
-        String query = "SELECT (SELECT SUM(GiaTien) FROM HoaDon_SanPhamChiTiet WHERE IDHoaDon = hd.IDHoaDon)\n"
+        String query = "SELECT (SELECT SUM(GiaTien*SoLuong) FROM HoaDon_SanPhamChiTiet WHERE IDHoaDon = hd.IDHoaDon)\n"
                 + "-	(\n"
                 + "		SELECT COALESCE(SUM((hdct.GiaTien*hdct.SoLuong*km.phan_tram_giam_gia)/100),0) \n"
                 + "		FROM HoaDon_SanPhamChiTiet hdct\n"
@@ -443,12 +446,13 @@ public class HoaDonRepository {
         return result;
     }
 // bắt đầu làm thêm sản phẩm vào hóa đơn
+
     public void insertBienTheToHoaDon(Long idHoaDonLong, Long idBienThe, Float giaTien, Integer soLuong) {
         String query = "INSERT INTO HoaDon_SanPhamChiTiet(IDHoaDon, IDSanPhamChiTiet, GiaTien, SoLuong) VALUES (?,?,?,?)";
         try {
             PreparedStatement ps = cn.prepareStatement(query);
             ps.setLong(1, idHoaDonLong);
-            ps.setLong(1, idBienThe);
+            ps.setLong(2, idBienThe);
             ps.setFloat(3, giaTien);
             ps.setInt(4, soLuong);
             ps.execute();
@@ -456,11 +460,100 @@ public class HoaDonRepository {
             e.printStackTrace();
         }
     }
-    
-    public void updateBienTheToHoaDon(Long idHoaDonLong, Long idBienThe, Integer soLuong){
-        
+
+    public void updateBienTheToHoaDon(Long id, Integer soLuong) {
+        String query = "UPDATE HoaDon_SanPhamChiTiet SET SoLuong = ? WHERE ID = ?";
+        try {
+            PreparedStatement ps = cn.prepareStatement(query);
+            ps.setInt(1, soLuong);
+            ps.setLong(2, id);
+            ps.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
-    
-    
+
+    public void updateSoLuongBienThe(Long id, Integer soLuong) {
+        String query = "UPDATE SanPhamChiTiet SET SoLuong = ? WHERE IDSanPhamChiTiet = ?";
+        try {
+            PreparedStatement ps = cn.prepareStatement(query);
+            ps.setInt(1, soLuong);
+            ps.setLong(2, id);
+            ps.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Long isExistBienTheHoaDon(Long idHoaDon, Long idBienThe) {
+        String query = "SELECT ID FROM HoaDon_SanPhamChiTiet WHERE IDHoaDon = ? AND IDSanPhamChiTiet = ?";
+        try {
+            PreparedStatement ps = cn.prepareStatement(query);
+            ps.setLong(1, idHoaDon);
+            ps.setLong(2, idBienThe);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                return rs.getLong(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Integer getSoLuongBienTheTrongGioHangById(Long id) {
+        String query = "SELECT SoLuong FROM HoaDon_SanPhamChiTiet WHERE ID = ?";
+        try {
+            PreparedStatement ps = cn.prepareStatement(query);
+            ps.setLong(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Integer getSoLuongBienTheById(Long id) {
+        String query = "SELECT SoLuong FROM SanPhamChiTiet WHERE IDSanPhamChiTiet = ?";
+        try {
+            PreparedStatement ps = cn.prepareStatement(query);
+            ps.setLong(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Float getGiaBanBienTheById(Long id) {
+        String query = "SELECT GiaBan FROM SanPhamChiTiet WHERE IDSanPhamChiTiet = ?";
+        try {
+            PreparedStatement ps = cn.prepareStatement(query);
+            ps.setLong(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                return rs.getFloat(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

@@ -10,6 +10,7 @@ package com.poly.form.hoadon.entity;
  */
 public class GioHang {
 
+    private Long id;
     private Long idSanPhamChiTiet;
     private String maSanPham;
     private String tenSanPham;
@@ -22,7 +23,8 @@ public class GioHang {
     public GioHang() {
     }
 
-    public GioHang(Long idSanPhamChiTiet, String maSanPham, String tenSanPham, String tenMau, Integer soLuong, Float giaBan, Float giamKhuyenMai, Float thanhTien) {
+    public GioHang(Long id, Long idSanPhamChiTiet, String maSanPham, String tenSanPham, String tenMau, Integer soLuong, Float giaBan, Float giamKhuyenMai, Float thanhTien) {
+        this.id = id;
         this.idSanPhamChiTiet = idSanPhamChiTiet;
         this.maSanPham = maSanPham;
         this.tenSanPham = tenSanPham;
@@ -43,6 +45,14 @@ public class GioHang {
             giamKhuyenMai,
             thanhTien
         };
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getIdSanPhamChiTiet() {
@@ -111,7 +121,9 @@ public class GioHang {
 
     @Override
     public String toString() {
-        return "GioHang{" + "idSanPhamChiTiet=" + idSanPhamChiTiet + ", maSanPham=" + maSanPham + ", tenSanPham=" + tenSanPham + ", tenMau=" + tenMau + ", soLuong=" + soLuong + ", giaBan=" + giaBan + ", giamKhuyenMai=" + giamKhuyenMai + ", thanhTien=" + thanhTien + '}';
+        return "GioHang{" + "id=" + id + ", idSanPhamChiTiet=" + idSanPhamChiTiet + ", maSanPham=" + maSanPham + ", tenSanPham=" + tenSanPham + ", tenMau=" + tenMau + ", soLuong=" + soLuong + ", giaBan=" + giaBan + ", giamKhuyenMai=" + giamKhuyenMai + ", thanhTien=" + thanhTien + '}';
     }
+
+    
 
 }

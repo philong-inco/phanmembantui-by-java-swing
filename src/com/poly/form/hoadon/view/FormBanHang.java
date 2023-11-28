@@ -1,6 +1,16 @@
 package com.poly.form.hoadon.view;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamPanel;
+import com.github.sarxos.webcam.WebcamResolution;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.LuminanceSource;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.Result;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
 import com.poly.form.hoadon.entity.BienTheSearch;
 import com.poly.form.hoadon.entity.GioHang;
 import com.poly.form.hoadon.entity.HoaDon;
@@ -16,12 +26,17 @@ import com.poly.form.thuoctinh.entity.ThuocTinhMauDTO;
 import com.poly.form.thuoctinh.service.ThuocTinhMauService;
 import static com.poly.util.ph31848.ConvertDateToLong.getLongTimeHienTai;
 import static com.poly.util.ph31848.MaRandom.renderMa;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import raven.toast.Notifications;
 
-public class FormBanHang extends javax.swing.JPanel {
+public class FormBanHang extends javax.swing.JPanel implements Runnable, ThreadFactory {
     
     private DefaultTableModel dtmHoaDon;
     private DefaultTableModel dtmGioHang;
@@ -35,6 +50,11 @@ public class FormBanHang extends javax.swing.JPanel {
     private List<BienTheSearch> listBienThe;
     private List<ThuocTinhMauDTO> listMau;
     private KhachHangSearch thongTinKhachHang;
+
+    //Webcam
+    private WebcamPanel panel = null;
+    private Webcam webcam = null;
+    private final Executor executor = Executors.newSingleThreadExecutor(this);
     
     public FormBanHang() {
         initComponents();
@@ -47,8 +67,114 @@ public class FormBanHang extends javax.swing.JPanel {
         serviceHoaDon = new HoaDonService();
         serviceMau = new ThuocTinhMauService();
         setDefaulView();
+        initWebcam();
     }
     
+    private void initWebcam() {
+        Dimension size = WebcamResolution.QVGA.getSize();
+        webcam = Webcam.getWebcams().get(0); //0 is default webcam
+        webcam.setViewSize(size);
+        
+        panel = new WebcamPanel(webcam);
+        panel.setPreferredSize(size);
+        panel.setFPSDisplayed(true);
+        
+        pnlWebcam.add(panel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 140, 140));
+        
+        executor.execute(this);
+    }
+    
+    @Override
+    public void run() {
+        do {
+            try {
+                Thread.sleep(700);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            
+            Result result = null;
+            BufferedImage image = null;
+            
+            if (webcam.isOpen()) {
+                if ((image = webcam.getImage()) == null) {
+                    continue;
+                }
+            }
+            
+            LuminanceSource source = new BufferedImageLuminanceSource(image);
+            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+            
+            try {
+                result = new MultiFormatReader().decode(bitmap);
+            } catch (NotFoundException e) {
+                //No result...
+            }
+            
+            if (result != null) {
+                String ma = result.getText();
+                themBienTheVaoHoaDonQRCode(ma);
+            }
+        } while (true);
+    }
+    
+    public void themBienTheVaoHoaDonQRCode(String ma) {
+        Long idBT = serviceHoaDon.getIDBienTheByMa(ma);
+        if (cboTrangThaiHoaDon.getSelectedIndex() == 0) {
+            if (idBT != null) {
+                Integer soLuongBienThe = serviceHoaDon.getSoLuongBienTheById(idBT);
+                Float giaBanBienThe = serviceHoaDon.getGiaBanBienTheById(idBT);
+                String soLuongNhap = JOptionPane.showInputDialog(this, "Nhập số lượng\nSố lượng còn lại: " + soLuongBienThe) + "";
+                if (checkEmpty(soLuongNhap)) {
+                    return;
+                }
+                if (!checkNumber(soLuongNhap) && !soLuongNhap.equals("")) {
+                    JOptionPane.showMessageDialog(this, "Số lượng không hợp lệ");
+                    return;
+                }
+                HoaDonDTO hd = listHoaDon.get(tblHoaDon.getSelectedRow());
+                Long idGH = serviceHoaDon.isExistBienTheHoaDon(hd.getIdHoaDon(), idBT);
+
+                ///
+                if (idGH == null) {
+
+                    // chưa có trong giỏ >> insert giỏ hàng và trừ số lượng biến thể
+                    if (Integer.valueOf(soLuongNhap) > soLuongBienThe) {
+                        JOptionPane.showMessageDialog(this, "Số lượng tồn kho không đủ");
+                        return;
+                    }
+                    serviceHoaDon.insertBienTheToHoaDon(hd.getIdHoaDon(), idBT, giaBanBienThe, Integer.valueOf(soLuongNhap));
+                    serviceHoaDon.updateSoLuongBienThe(idBT, soLuongBienThe - Integer.valueOf(soLuongNhap));
+                } else {
+                    // đã có trong giỏ >> so sánh 
+                    Integer soLuongBienTheTrongGioHang = serviceHoaDon.getSoLuongBienTheTrongGioHangById(idGH);
+                    if (Integer.valueOf(soLuongNhap) > soLuongBienThe) {
+                        JOptionPane.showMessageDialog(this, "Số lượng tồn kho không đủ");
+                        return;
+                    }
+                    serviceHoaDon.updateBienTheToHoaDon(idGH, soLuongBienTheTrongGioHang + Integer.valueOf(soLuongNhap));
+                    serviceHoaDon.updateSoLuongBienThe(idBT, soLuongBienThe - Integer.valueOf(soLuongNhap));
+                }
+
+                // load lại 2 bảng giỏ hàng và biến thể
+                reloadUpdateGioHang(hd.getIdHoaDon());
+                ///
+            } else {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy biến thể SP với mã " + ma);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Chỉ áp dụng với hóa đơn chờ thanh toán");
+        }
+    }
+    
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread t = new Thread(r, "My Thread");
+        t.setDaemon(true);
+        return t;
+    }
+
+    //Webcam
     public void setDefaulView() {
         cboHinhThucGiaoHang.setSelectedIndex(2);
         cboTrangThaiHoaDon.setSelectedIndex(7);
@@ -164,6 +290,13 @@ public class FormBanHang extends javax.swing.JPanel {
         txtTongTienGiam.setText(tongTienGiam + "");
         txtTongTienThanhToan.setText(tongThanhToan + "");
         txtTienKhachDua.setText(txtTongTien.getText());
+    }
+    
+    public void reloadUpdateGioHang(Long id) {
+        resertTableBienThe();
+        listGioHang = serviceHoaDon.getAllBienTheByIdHoaDon(id);
+        showTableGioHang(listGioHang);
+        reloadTongTienHoaDon(id);
     }
     
     @SuppressWarnings("unchecked")
@@ -365,7 +498,7 @@ public class FormBanHang extends javax.swing.JPanel {
         jPanel14.setLayout(jPanel14Layout);
         jPanel14Layout.setHorizontalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlWebcam, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pnlWebcam, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -993,6 +1126,11 @@ public class FormBanHang extends javax.swing.JPanel {
                 "Mã SP", "Tên SP", "Màu", "Số lượng", "Giá bán", "Giảm giá", "Thành tiền"
             }
         ));
+        tblGioHang.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblGioHangMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblGioHang);
 
         jButton6.setText("clear");
@@ -1052,6 +1190,11 @@ public class FormBanHang extends javax.swing.JPanel {
                 "Mã SP", "Tên SP", "Màu", "Tồn kho", "Giá bán", "Giảm giá"
             }
         ));
+        tblBienThe.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblBienTheMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblBienThe);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
@@ -1146,6 +1289,7 @@ public class FormBanHang extends javax.swing.JPanel {
             HoaDon hd = new HoaDon(1L, maHD, 0);
             serviceHoaDon.insertHoaDon(hd);
             cboTrangThaiHoaDon.setSelectedIndex(0);
+            cboHinhThucGiaoHang.setSelectedIndex(2);
         }
     }//GEN-LAST:event_btnThemActionPerformed
 
@@ -1247,6 +1391,96 @@ public class FormBanHang extends javax.swing.JPanel {
             cboTrangThaiHoaDon.setSelectedIndex(1);
         }
     }//GEN-LAST:event_btnLuaHoaDonActionPerformed
+
+    private void tblBienTheMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBienTheMouseClicked
+        if (cboTrangThaiHoaDon.getSelectedIndex() == 0) {
+            int indexHD = tblHoaDon.getSelectedRow();
+            int indexBT = tblBienThe.getSelectedRow();
+            
+            if (indexHD != -1) {
+                HoaDonDTO hd = listHoaDon.get(indexHD);
+                BienTheSearch bt = listBienThe.get(indexBT);
+                // Kiểm tra giá trị nhập input
+                String soLuongNhap = JOptionPane.showInputDialog(this, "Nhập số lượng:") + "";
+                if (checkEmpty(soLuongNhap)) {
+                    return;
+                }
+                if (!checkNumber(soLuongNhap) && !soLuongNhap.equals("")) {
+                    JOptionPane.showMessageDialog(this, "Số lượng cần là số nguyên dương");
+                    return;
+                }
+                
+                Long idGH = serviceHoaDon.isExistBienTheHoaDon(hd.getIdHoaDon(), bt.getIdBienThe());
+                if (idGH == null) {
+                    // chưa có trong giỏ >> insert giỏ hàng và trừ số lượng biến thể
+                    if (Integer.valueOf(soLuongNhap) > bt.getSoLuong()) {
+                        JOptionPane.showMessageDialog(this, "Số lượng tồn kho không đủ");
+                        return;
+                    }
+                    serviceHoaDon.insertBienTheToHoaDon(hd.getIdHoaDon(), bt.getIdBienThe(), bt.getGiaBan(), Integer.valueOf(soLuongNhap));
+                    serviceHoaDon.updateSoLuongBienThe(bt.getIdBienThe(), bt.getSoLuong() - Integer.valueOf(soLuongNhap));
+                } else {
+                    // đã có trong giỏ >> so sánh 
+                    Integer soLuongBienTheTrongGioHang = serviceHoaDon.getSoLuongBienTheTrongGioHangById(idGH);
+                    if (Integer.valueOf(soLuongNhap) > bt.getSoLuong()) {
+                        JOptionPane.showMessageDialog(this, "Số lượng tồn kho không đủ");
+                        return;
+                    }
+                    serviceHoaDon.updateBienTheToHoaDon(idGH, soLuongBienTheTrongGioHang + Integer.valueOf(soLuongNhap));
+                    serviceHoaDon.updateSoLuongBienThe(bt.getIdBienThe(), bt.getSoLuong() - Integer.valueOf(soLuongNhap));
+                }
+
+                // load lại 2 bảng giỏ hàng và biến thể
+                reloadUpdateGioHang(hd.getIdHoaDon());
+            } else {
+                JOptionPane.showMessageDialog(this, "Chọn hóa đơn trước");
+            }
+        }
+        
+
+    }//GEN-LAST:event_tblBienTheMouseClicked
+
+    private void tblGioHangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblGioHangMouseClicked
+        try {
+            if (cboTrangThaiHoaDon.getSelectedIndex() == 0) {
+                int indexHD = tblHoaDon.getSelectedRow();
+                int indexGH = tblGioHang.getSelectedRow();
+                HoaDonDTO hd = listHoaDon.get(indexHD);
+                GioHang gh = listGioHang.get(indexGH);
+                String soLuongNhap = JOptionPane.showInputDialog(this, "Nhập số lượng") + "";
+                // check số lượng nhập
+                if (checkEmpty(soLuongNhap)) {
+                    return;
+                }
+                if (!checkNumber(soLuongNhap) && !soLuongNhap.equals("")) {
+                    JOptionPane.showMessageDialog(this, "Số lượng phải là số nguyên dương");
+                }
+                Integer soLuongBienThe = serviceHoaDon.getSoLuongBienTheById(gh.getIdSanPhamChiTiet());
+                Integer soLuongTrongGioHang = gh.getSoLuong();
+                Integer checkCase = Integer.valueOf(soLuongNhap) - soLuongTrongGioHang;
+                if (checkCase == 0) {
+                    return;
+                }
+                if (checkCase > 0) {
+                    if (Integer.valueOf(soLuongNhap) - soLuongTrongGioHang > soLuongBienThe) {
+                        JOptionPane.showMessageDialog(this, "Số lượng tồn kho không đủ");
+                        return;
+                    }
+                    serviceHoaDon.updateBienTheToHoaDon(gh.getId(), Integer.valueOf(soLuongNhap));
+                    serviceHoaDon.updateSoLuongBienThe(gh.getIdSanPhamChiTiet(), soLuongBienThe - ((Integer.valueOf(soLuongNhap) - soLuongTrongGioHang)));
+                }
+                if (checkCase < 0) {
+                    serviceHoaDon.updateBienTheToHoaDon(gh.getId(), Integer.valueOf(soLuongNhap));
+                    serviceHoaDon.updateSoLuongBienThe(gh.getIdSanPhamChiTiet(), soLuongBienThe + soLuongTrongGioHang - Integer.valueOf(soLuongNhap));
+                }
+                reloadUpdateGioHang(hd.getIdHoaDon());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+
+    }//GEN-LAST:event_tblGioHangMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChonKhachHang;

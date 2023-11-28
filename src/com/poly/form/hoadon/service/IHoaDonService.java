@@ -47,4 +47,18 @@ public interface IHoaDonService {
 
     Float getTienThanhToanHoaDonById(Long id);
 
+    void insertBienTheToHoaDon(Long idHoaDonLong, Long idBienThe, Float giaTien, Integer soLuong);
+
+    void updateBienTheToHoaDon(Long id, Integer soLuong);
+
+    void updateSoLuongBienThe(Long id, Integer soLuong);
+
+    Long isExistBienTheHoaDon(Long idHoaDon, Long idBienThe);
+
+    Integer getSoLuongBienTheTrongGioHangById(Long id);
+
+    Integer getSoLuongBienTheById(Long id);
+
+    Float getGiaBanBienTheById(Long id);
+
 }
