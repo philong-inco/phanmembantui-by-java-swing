@@ -30,7 +30,7 @@ public class Menu extends JPanel {
         {"~Nhóm 3~"},
         {"Thống kê"},
         {"Sản phẩm", "Danh sách sản phẩm", "Thống kê", "Thuộc tính", "Thể loại", "Nhà cung cấp"},
-        {"Quản lý hóa đơn","Trang chủ", "Trang con 1", "Trang con 2"},
+        {"Quản lý hóa đơn","Bán hàng", "Trang con 1", "Trang con 2"},
         {"Đổi hàng" },
         {"Quản lý nhân viên","Trang chủ", "Trang con 1", "Trang con 2"},
         {"Quản lý khách hàng","Trang chủ", "Khách hàng đã xóa", "Gửi gmail khách hàng"},

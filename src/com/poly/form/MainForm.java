@@ -23,9 +23,8 @@ import com.poly.form.giaohang.FormQuanLyGiaoHangItem1;
 import com.poly.form.giaohang.FormQuanLyGiaoHangItem2;
 
 import com.poly.form.nhanvien.FormQuanLyNhanVien;
-import com.poly.form.hoadon.FormQuanLyHoaDon;
-import com.poly.form.hoadon.FormQuanLyHoaDonItem1;
-import com.poly.form.hoadon.FormQuanLyHoaDonItem2;
+import com.poly.form.hoadon.view.FormQuanLyHoaDon;
+
 import com.poly.form.nhanvien.FormQuanLyNhanVienItem1;
 import com.poly.form.nhanvien.FormQuanLyNhanVienItem2;
 import com.poly.form.sanpham.view.DanhSachSanPham;
@@ -37,6 +36,7 @@ import com.poly.form.doihang.view.DoiHangConfigs;
 import com.poly.form.doihang.view.FormQuanLyDoiHang;
 import com.poly.form.doihang.view.LichSuChiTiet;
 import com.poly.form.doihang.view.LichSuDoiHang;
+import com.poly.form.hoadon.view.FormBanHang;
 import com.poly.form.khachhang.view.FormCaiDaiMail;
 import com.poly.form.khachhang.view.FormQuanLyKhachHang;
 import com.poly.form.khachhang.view.FormQuanLyKhachHangDaXoa;
@@ -126,11 +126,9 @@ public class MainForm extends JLayeredPane {
                 }
             } else if (index == 2) {
                 if (subIndex == 1) {
-                    Application.showForm(new FormQuanLyHoaDon());
+                    Application.showForm(new FormBanHang());
                 } else if (subIndex == 2) {
-                    Application.showForm(new FormQuanLyHoaDonItem1());
-                } else if (subIndex == 3) {
-                    Application.showForm(new FormQuanLyHoaDonItem2());
+                    Application.showForm(new FormQuanLyHoaDon());
                 }
             } else if (index == 3) {
                 if (subIndex == 0) {
